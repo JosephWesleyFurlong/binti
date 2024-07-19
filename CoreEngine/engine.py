@@ -4,7 +4,7 @@ from CoreEngine import engine_snowflake_connector as esc
 
 class Engine:
     def __init__(self, url, snowflake_db, snowflake_schema, snowflake_table, SB_mapping,
-                 operation_name, key_identifier=""):
+                 operation_name, token, key_identifier=""):
         self.url = url
         self.snowflake_db = snowflake_db
         self.snowflake_schema = snowflake_schema
@@ -12,11 +12,18 @@ class Engine:
         self.SB_mapping = SB_mapping
         self.operation_name = operation_name
         self.key_identifier = key_identifier
-
+        self.token = token
 
     def request_and_process_data(self):
         try:
             # data = requests.get(self.url)
+
+            headers = {
+                'Authorization': f'Bearer {self.token}',
+                'Content-Type': 'application/json'  # Add other headers if necessary
+            }
+
+            data = requests.get(self.url, headers=headers)
 
             data = {
               "data": [

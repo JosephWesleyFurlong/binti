@@ -21,6 +21,8 @@ SB_mapping = {
 }
 operation_name = "update_insert"
 key_identifier = "id"
-engine_obj = engine.Engine(url, snowflake_db, snowflake_schema, snowflake_table, SB_mapping, operation_name, key_identifier)
+binti_token = ""
+engine_obj = engine.Engine(url, snowflake_db, snowflake_schema, snowflake_table, SB_mapping,
+                           operation_name, binti_token, key_identifier)
 
 engine_obj.start_engine()
