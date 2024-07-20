@@ -79,7 +79,7 @@ class Engine:
                         print("Reached here 4")
                         each_data = each_data[key_relations[relation_index]]
                     data_dict = {
-                        key: each_data if flag else ""
+                        key: each_data if flag else "NA"
                     }
                     print("Reached here 6")
                     BV_mapping[int(id)].update(data_dict)
