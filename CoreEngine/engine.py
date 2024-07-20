@@ -59,6 +59,9 @@ class Engine:
             #       }
             #     }]
             # }
+            print("data", data)
+            print("DATA returned", len(data["data"]))
+            return
             BV_mapping = defaultdict(dict)
             for key in self.SB_mapping.keys():
                 key_relations = key.split(".")
