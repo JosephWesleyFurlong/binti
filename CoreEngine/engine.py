@@ -25,7 +25,9 @@ class Engine:
             }
 
             data = requests.get(self.url, headers=headers)
-            print("Data from URL->", data.json())
+            print("Request Status Code", data.status_code)
+            if data.status_code == 200:
+                print("Data from URL->", data.json())
             # data = {
             #   "data": [
             #     {
