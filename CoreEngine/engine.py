@@ -73,12 +73,16 @@ class Engine:
                         if key_relations[relation_index] not in each_data:
                             flag=False
                             break
+                        print("Reached here 4")
                         each_data = each_data[key_relations[relation_index]]
                     if flag:
+                        print("Reached here 5")
                         data_dict = {
                             key: each_data
                         }
+                        print("Reached here 6")
                         BV_mapping[int(id)].update(data_dict)
+                        print("Reached here 7")
             print("BV_mapping", BV_mapping)
             return BV_mapping
         except Exception as e:
