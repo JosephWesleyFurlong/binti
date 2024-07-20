@@ -28,6 +28,7 @@ class Engine:
             print("Request Status Code", data.status_code)
             if data.status_code == 200:
                 print("Data from URL->", data.json())
+                data = data.json()
             # data = {
             #   "data": [
             #     {
