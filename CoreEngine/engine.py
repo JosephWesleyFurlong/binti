@@ -73,19 +73,17 @@ class Engine:
                     flag = True
                     for relation_index in range(key_relations_length):
                         print("Reached here 3", key_relations, relation_index, each_data)
-                        if key_relations[relation_index] not in each_data:
+                        if each_data and key_relations[relation_index] not in each_data:
                             flag=False
                             break
                         print("Reached here 4")
                         each_data = each_data[key_relations[relation_index]]
-                    if flag:
-                        print("Reached here 5")
-                        data_dict = {
-                            key: each_data
-                        }
-                        print("Reached here 6")
-                        BV_mapping[int(id)].update(data_dict)
-                        print("Reached here 7")
+                    data_dict = {
+                        key: each_data if flag else ""
+                    }
+                    print("Reached here 6")
+                    BV_mapping[int(id)].update(data_dict)
+                    print("Reached here 7")
             print("BV_mapping", BV_mapping)
             return BV_mapping
         except Exception as e:
