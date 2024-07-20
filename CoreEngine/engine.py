@@ -63,10 +63,13 @@ class Engine:
             for key in self.SB_mapping.keys():
                 key_relations = key.split(".")
                 key_relations_length = len(key_relations)
+                print("Reached here 1")
                 for each_data in data["data"]:
+                    print("Reached here 2")
                     id = each_data["id"]
                     flag = True
                     for relation_index in range(key_relations_length):
+                        print("Reached here 3")
                         if key_relations[relation_index] not in each_data:
                             flag=False
                             break
@@ -76,7 +79,7 @@ class Engine:
                             key: each_data
                         }
                         BV_mapping[int(id)].update(data_dict)
-
+            print("BV_mapping", BV_mapping)
             return BV_mapping
         except Exception as e:
             print(e)
