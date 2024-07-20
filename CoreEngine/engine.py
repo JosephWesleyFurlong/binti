@@ -73,7 +73,7 @@ class Engine:
                     flag = True
                     for relation_index in range(key_relations_length):
                         print("Reached here 3", key_relations, relation_index, each_data)
-                        if each_data and key_relations[relation_index] not in each_data:
+                        if each_data or key_relations[relation_index] not in each_data:
                             flag=False
                             break
                         print("Reached here 4")
