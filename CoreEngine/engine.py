@@ -98,7 +98,7 @@ class Engine:
         for each_value in data.values():
             column_data = []
             for key, value in each_value.items():
-                if type(value, list):
+                if isinstance(value, list):
                     value = ",".join(map(str, value))
                 column_data.append(f'\'{value}\'')
             column_data = f"({','.join(column_data)})"
@@ -123,7 +123,7 @@ class Engine:
             sql_query = f'UPDATE "{self.snowflake_db}"."{self.snowflake_schema}"."{self.snowflake_table}" SET '
             print(data_to_be_updated, each_id, data)
             for key, value in data_to_be_updated.items():
-                if type(value, list):
+                if isinstance(value, list):
                     value = ",".join(map(str, value))
                 sql_query += f'{self.SB_mapping[key]} = \'{value}\','
             sql_query = sql_query[:-1]
