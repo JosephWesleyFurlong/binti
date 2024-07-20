@@ -20,41 +20,42 @@ class Engine:
 
             headers = {
                 'Authorization': f'Bearer {self.token}',
-                'Content-Type': 'application/json'  # Add other headers if necessary
+                'Content-Type': 'application/json',
+                'User-Agent': 'PostmanRuntime/7.29.2'
             }
 
             data = requests.get(self.url, headers=headers)
-
-            data = {
-              "data": [
-                {
-                  "id": "911026",
-                  "type": "agency-workers",
-                  "attributes": {
-                    "created-at": "2022-03-22T16:07:23.936Z",
-                    "updated-at": "2024-05-24T01:29:22.663Z",
-                    "name": "FH Licensing",
-                    "email": "iiiiii@crossnore.org",
-                    "supervisors": [],
-                    "managers-of-supervisors": [],
-                    "agency-role": "approvals_placements_admin",
-                    "role-for-permissions": {
-                      "id": 9,
-                      "name": "Approvals/Placements Worker w/ All Agency Families Access"
-                    },
-                    "external-identifier": "",
-                    "sign-in-count": 2
-                  },
-                  "relationships": {
-                    "agency-admin-assignment": {
-                      "data": {
-                        "id": "11126",
-                        "type": "agency-admin-assignments"
-                      }
-                    }
-                  }
-                }]
-            }
+            print("Data from URL->", data.json())
+            # data = {
+            #   "data": [
+            #     {
+            #       "id": "911026",
+            #       "type": "agency-workers",
+            #       "attributes": {
+            #         "created-at": "2022-03-22T16:07:23.936Z",
+            #         "updated-at": "2024-05-24T01:29:22.663Z",
+            #         "name": "FH Licensing",
+            #         "email": "iiiiii@crossnore.org",
+            #         "supervisors": [],
+            #         "managers-of-supervisors": [],
+            #         "agency-role": "approvals_placements_admin",
+            #         "role-for-permissions": {
+            #           "id": 9,
+            #           "name": "Approvals/Placements Worker w/ All Agency Families Access"
+            #         },
+            #         "external-identifier": "",
+            #         "sign-in-count": 2
+            #       },
+            #       "relationships": {
+            #         "agency-admin-assignment": {
+            #           "data": {
+            #             "id": "11126",
+            #             "type": "agency-admin-assignments"
+            #           }
+            #         }
+            #       }
+            #     }]
+            # }
             BV_mapping = defaultdict(dict)
             for key in self.SB_mapping.keys():
                 key_relations = key.split(".")
@@ -94,6 +95,8 @@ class Engine:
         for each_value in data.values():
             column_data = []
             for key, value in each_value.items():
+                if type(value, list):
+                    value = ",".join(map(str, value))
                 column_data.append(f'\'{value}\'')
             column_data = f"({','.join(column_data)})"
             column_data_list.append(column_data)
@@ -117,6 +120,8 @@ class Engine:
             sql_query = f'UPDATE "{self.snowflake_db}"."{self.snowflake_schema}"."{self.snowflake_table}" SET '
             print(data_to_be_updated, each_id, data)
             for key, value in data_to_be_updated.items():
+                if type(value, list):
+                    value = ",".join(map(str, value))
                 sql_query += f'{self.SB_mapping[key]} = \'{value}\','
             sql_query = sql_query[:-1]
             sql_query += f' WHERE {self.key_identifier} = {each_id}'
