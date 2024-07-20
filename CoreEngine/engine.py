@@ -67,6 +67,7 @@ class Engine:
                 for each_data in data["data"]:
                     print("Reached here 2")
                     if not each_data or each_data is None:
+                        print("skipping data set", each_data)
                         continue
                     id = each_data["id"]
                     flag = True
