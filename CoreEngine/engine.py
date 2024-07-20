@@ -66,10 +66,12 @@ class Engine:
                 print("Reached here 1")
                 for each_data in data["data"]:
                     print("Reached here 2")
+                    if not each_data:
+                        continue
                     id = each_data["id"]
                     flag = True
                     for relation_index in range(key_relations_length):
-                        print("Reached here 3")
+                        print("Reached here 3", key_relations, relation_index, each_data)
                         if key_relations[relation_index] not in each_data:
                             flag=False
                             break
