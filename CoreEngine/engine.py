@@ -66,7 +66,7 @@ class Engine:
                 print("Reached here 1")
                 for each_data in data["data"]:
                     print("Reached here 2")
-                    if not each_data:
+                    if not each_data or each_data is None:
                         continue
                     id = each_data["id"]
                     flag = True
