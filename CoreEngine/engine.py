@@ -147,8 +147,8 @@ class Engine:
         current_page = 1
         while True:
             data = self.add_data_to_snowflake(page_number=current_page)
-            total_pages = data["meta"]["total_pages"]
-            current_page = data["meta"]["current_page"]
+            total_pages = data["total_pages"]
+            current_page = data["current_page"]
             if current_page < total_pages:
                 current_page = current_page + 1
             else:
