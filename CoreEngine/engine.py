@@ -14,7 +14,7 @@ class Engine:
         self.key_identifier = key_identifier
         self.token = token
 
-    def request_and_process_data(self):
+    def request_and_process_data(self, page_number=1):
         try:
             # data = requests.get(self.url)
 
@@ -24,11 +24,18 @@ class Engine:
                 'User-Agent': 'PostmanRuntime/7.29.2'
             }
 
-            data = requests.get(self.url, headers=headers)
+            params = {
+                "page[number]": page_number,
+                "tz": "utc"
+            }
+
+            data = requests.get(self.url, headers=headers, params=params)
+            metadata = dict()
             print("Request Status Code", data.status_code)
             if data.status_code == 200:
                 print("Data from URL->", data.json())
                 data = data.json()
+                metadata = data["meta"]
             # data = {
             #   "data": [
             #     {
@@ -59,47 +66,37 @@ class Engine:
             #       }
             #     }]
             # }
-            print("data", data)
-            print("DATA returned", len(data["data"]))
-            return
+
             BV_mapping = defaultdict(dict)
             for key in self.SB_mapping.keys():
                 key_relations = key.split(".")
                 key_relations_length = len(key_relations)
-                print("Reached here 1")
                 for each_data in data["data"]:
-                    print("Reached here 2")
                     if not each_data or each_data is None:
-                        print("skipping data set", each_data)
                         continue
                     id = each_data["id"]
                     flag = True
                     for relation_index in range(key_relations_length):
-                        print("Reached here 3", key_relations, relation_index, each_data)
                         if not each_data or key_relations[relation_index] not in each_data:
-                            flag=False
+                            flag = False
                             break
-                        print("Reached here 4")
                         each_data = each_data[key_relations[relation_index]]
                     data_dict = {
                         key: each_data if flag else "NA"
                     }
-                    print("Reached here 6")
                     BV_mapping[int(id)].update(data_dict)
-                    print("Reached here 7")
-            print("BV_mapping", BV_mapping)
-            return BV_mapping
+            return BV_mapping, metadata
         except Exception as e:
-            print(e)
-            return f"Error-{e}"
+            print("Error-", e)
+            return None, None
 
-    def add_data_to_snowflake(self):
-        data = self.request_and_process_data()
-        print(data)
+    def add_data_to_snowflake(self, page_number=1):
+        data, meta_data = self.request_and_process_data(page_number=page_number)
         if self.operation_name == "insert":
             self.insert_data_to_snowflake(data)
         elif self.operation_name == "update_insert":
             self.update_data_to_snowflake(data)
+        return meta_data
 
     def insert_data_to_snowflake(self, data):
         conn = esc.connect_snowflake(self.snowflake_db, self.snowflake_schema)
@@ -124,7 +121,6 @@ class Engine:
         conn = esc.connect_snowflake(self.snowflake_db, self.snowflake_schema)
         cur = conn.cursor()
         sql_query = f'SELECT {self.key_identifier} FROM "{self.snowflake_db}"."{self.snowflake_schema}"."{self.snowflake_table}" where {self.key_identifier} in ({",".join(map(str, data_keys))})'
-        print(sql_query)
         sql_data = cur.execute(sql_query)
         sql_data = sql_data.fetchall()
         sql_data = [each_data[0] for each_data in sql_data]
@@ -132,18 +128,14 @@ class Engine:
         for each_id in sql_data:
             data_to_be_updated = data[int(each_id)]
             sql_query = f'UPDATE "{self.snowflake_db}"."{self.snowflake_schema}"."{self.snowflake_table}" SET '
-            print(data_to_be_updated, each_id, data)
             for key, value in data_to_be_updated.items():
                 if isinstance(value, list):
                     value = ",".join(map(str, value))
                 sql_query += f'{self.SB_mapping[key]} = \'{value}\','
             sql_query = sql_query[:-1]
             sql_query += f' WHERE {self.key_identifier} = {each_id}'
-            print(sql_query)
             cur.execute(sql_query)
-        print(data_keys, sql_data)
         remaining_keys = list(set(map(int, data_keys)) - set(map(int, sql_data)))
-        print(remaining_keys)
         insertion_data = defaultdict(dict)
         for each_key in remaining_keys:
             insertion_data[each_key] = data[each_key]
@@ -151,5 +143,15 @@ class Engine:
             self.insert_data_to_snowflake(insertion_data)
 
     def start_engine(self):
-        self.add_data_to_snowflake()
+        print("Engine Started")
+        current_page = 1
+        while True:
+            data = self.add_data_to_snowflake(page_number=current_page)
+            total_pages = data["meta"]["total_pages"]
+            current_page = data["meta"]["current_page"]
+            if current_page < total_pages:
+                current_page = current_page + 1
+            else:
+                break
+        print("Engine Stopped")
 

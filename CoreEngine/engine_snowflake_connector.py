@@ -4,7 +4,6 @@ from engine_keys import EngineKeys
 
 
 def connect_snowflake(database_name, schema_name):
-    print(EngineKeys.SNOWFLAKE_WAREHOUSE)
     conn = sf.connect(
             account=EngineKeys.SNOWFLAKE_ACCOUNT,
             user=EngineKeys.SNOWFLAKE_USER,
