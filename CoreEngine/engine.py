@@ -135,6 +135,8 @@ class Engine:
             for key, value in data_to_be_updated.items():
                 if isinstance(value, list):
                     value = ",".join(map(str, value))
+                if isinstance(value, str):
+                    value=value.replace("'", "")
                 sql_query += f'{self.SB_mapping[key]} = \'{value}\','
             sql_query = sql_query[:-1]
             sql_query += f' WHERE {self.key_identifier} = {each_id}'
