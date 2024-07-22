@@ -85,6 +85,7 @@ class Engine:
                         key: each_data if flag else "NA"
                     }
                     BV_mapping[int(id)].update(data_dict)
+            print("meta_data2", metadata)
             return BV_mapping, metadata
         except Exception as e:
             print("Error-", e)
@@ -96,6 +97,7 @@ class Engine:
             self.insert_data_to_snowflake(data)
         elif self.operation_name == "update_insert":
             self.update_data_to_snowflake(data)
+        print("meta_data", meta_data)
         return meta_data
 
     def insert_data_to_snowflake(self, data):
