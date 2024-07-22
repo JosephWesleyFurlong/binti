@@ -108,6 +108,8 @@ class Engine:
             for key, value in each_value.items():
                 if isinstance(value, list):
                     value = ",".join(map(str, value))
+                if isinstance(value, str):
+                    value=value.replace("'", "")
                 column_data.append(f'\'{value}\'')
             column_data = f"({','.join(column_data)})"
             column_data_list.append(column_data)
